@@ -58,7 +58,19 @@ initial_prompt = ChatPromptTemplate.from_messages([
     ("human", "1. **Place Name:**\n   - **Brief:** [Brief description]\n   - **Budget:** [Estimated budget]\n   - **Activities:** [List of activities]\n   \n   Example:\n   - **Place Name:** Paris\n     - **Brief:** A romantic city known for its art and culture.\n     - **Budget:** $2000 for a 5-day trip\n     - **Activities:** Visiting the Eiffel Tower, Louvre Museum, Seine River Cruise"),
 ])
 
+
+detailed_plan_prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are an expert travel planner providing a detailed itinerary for a selected destination."),
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "Based on the place '{place_name}', generate a detailed plan including daily activities, recommended places to stay, and dining options. Provide the response in the following structured format:"),
+    ("human", "1. **Day 1:**\n   - **Activities:** [List of activities]\n   - **Places to Stay:** [Recommended hotels or accommodations]\n   - **Dining Options:** [Recommended restaurants]\n   \n   Example:\n   - **Day 1:**\n     - **Activities:** Visit the Eiffel Tower, explore Montmartre\n     - **Places to Stay:** Hotel Paris View, Montmartre Inn\n     - **Dining Options:** Le Jules Verne, Café de Flore"),
+])
+
+
+
 initial_chain = initial_prompt | llm | StrOutputParser()
+recommendation_chain = detailed_plan_prompt | llm | StrOutputParser()
+
 
 initial_chain_with_history = RunnableWithMessageHistory(
     initial_chain,
@@ -66,6 +78,14 @@ initial_chain_with_history = RunnableWithMessageHistory(
     input_messages_key="query",
     history_messages_key="history",
 )
+
+recommendation_with_history = RunnableWithMessageHistory(
+    recommendation_chain,
+    getsessionid,
+    # input_messages_key="query",
+    history_messages_key="history",
+)
+
 config = {"configurable": {"session_id": session_id}}
 
 
@@ -92,11 +112,31 @@ def send_data():
         config=config
     )
     print("Places to visit:", response)
+    # extracted_info = extract_travel_info(response)
+    # for info in extracted_info:
+    #    print(info)
     extracted_info = extract_travel_info(response)
-    for info in extracted_info:
-       print(info)
+    print("Here are the suggested places to visit:")
+    for idx, info in enumerate(extracted_info, start=1):
+        print(f"{idx}. {info['Place Name']}: {info['Brief']}, Budget: {info['Budget']}, Activities: {', '.join(info['Activities'])}")
 
+    # Get user choice
+    choice = int(input(f"Select a place by entering the number (1-{len(extracted_info)}): "))
+    selected_place = extracted_info[choice - 1]['Place Name']
 
+    # Generate and display the full trip plan for the selected place
+    full_plan = generate_full_trip_plan(selected_place)
+    print(f"Here is the detailed plan for {selected_place}:\n{full_plan}")
+
+def generate_full_trip_plan(place_name):
+    response = recommendation_with_history.invoke(
+        {
+            "place_name": place_name,
+            # "history": ""  # Provide an empty history if not using a previous history
+        },
+        config=config
+    )
+    return response
 
 
 
