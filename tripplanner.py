@@ -1,5 +1,14 @@
 from flask import Flask, request, jsonify
+from dotenv import load_dotenv
+import os
 
+# Load the .env file
+load_dotenv()
+
+# Access the API key
+api_key = os.getenv('API_KEY')
+
+# print(f'Your API key is: {api_key}')
 from langchain_huggingface import HuggingFaceEndpoint
 from langchain_core.output_parsers import StrOutputParser
 
@@ -29,7 +38,7 @@ llm = HuggingFaceEndpoint(
     repetition_penalty=1.03,
     callbacks=callbacks,
     streaming=True,
-    huggingfacehub_api_token='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',
+    huggingfacehub_api_token=api_key,
 )
 
 store ={}
