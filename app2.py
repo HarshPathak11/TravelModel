@@ -15,7 +15,7 @@ from langchain_core.prompts import (
 )
 import os
 sec_key=os.getenv('TOKEN')
-# print(sec_key)
+print(sec_key)
 
 from langchain_core.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
@@ -421,7 +421,7 @@ def send_data():
 
     itinerary_dict = extract_itinerary(trip_plan_response)
     print(itinerary_dict)
-    return jsonify(itinerary_dict)
+    return jsonify(places_dict)
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
