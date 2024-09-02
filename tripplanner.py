@@ -168,6 +168,20 @@ def extract_travel_info(response_text):
 
     return places_info
 
+
+send_data()
+
+
+
+
+
+
+
+
+
+
+
+
 # Example usage
 # response_text = """
 # 1. **Place Name:** Paris
@@ -184,4 +198,3 @@ def extract_travel_info(response_text):
 # extracted_info = extract_travel_info(response)
 # for info in extracted_info:
 #     print(info)
-send_data()
