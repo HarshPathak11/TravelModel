@@ -32,7 +32,7 @@ llm = HuggingFaceEndpoint(
     repetition_penalty=1.03,
     callbacks=callbacks,
     streaming=True,
-    huggingfacehub_api_token='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',
+    huggingfacehub_api_token='',
 )
 
 # dictionary to store the chat message history with its session ID

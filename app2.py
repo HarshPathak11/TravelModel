@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import re
-
+from dotenv import load_dotenv
+load_dotenv()
 app = Flask(__name__)
 
 from langchain_huggingface import HuggingFaceEndpoint
@@ -12,6 +13,9 @@ from langchain_core.prompts import (
     ChatPromptTemplate,
     MessagesPlaceholder,
 )
+import os
+sec_key=os.getenv('TOKEN')
+# print(sec_key)
 
 from langchain_core.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 
@@ -32,7 +36,7 @@ llm = HuggingFaceEndpoint(
     repetition_penalty=1.03,
     callbacks=callbacks,
     streaming=True,
-    huggingfacehub_api_token='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',
+    huggingfacehub_api_token=sec_key,
 )
 
 # dictionary to store the chat message history with its session ID
